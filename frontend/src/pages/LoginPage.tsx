@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 ;
-import { useAuth } from "../auth/AuthContext";
 import API from "../services/apis";
+import { useAuth } from "../auth/useAuth";
 
 const LoginPage = () => {
   const { setToken } = useAuth();

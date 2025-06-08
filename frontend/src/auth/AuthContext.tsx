@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 
 interface AuthContextType {
@@ -10,17 +10,23 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [token, setTokenState] = useState<string | null>(null);
+  const [token, setTokenState] = useState<string | null>(() => Cookies.get("token") || null);
 
+  // Check token on every render
   useEffect(() => {
-    const storedToken = Cookies.get("token") || null;
-    setTokenState(storedToken);
-  }, []);
+    const storedToken = Cookies.get("token");
+    if (storedToken !== token) {
+      setTokenState(storedToken || null);
+    }
+  }, [token]);
 
   const setToken = (newToken: string | null) => {
     setTokenState(newToken);
     if (newToken) {
-      Cookies.set("token", newToken, { secure: true, sameSite: "strict" });
+      Cookies.set("token", newToken, { 
+        secure: import.meta.env.PROD,
+        sameSite: 'lax'
+      });
     } else {
       Cookies.remove("token");
     }
@@ -35,8 +41,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within AuthProvider");
-  return context;
-};
+export default AuthContext;
