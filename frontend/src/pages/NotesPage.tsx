@@ -3,6 +3,8 @@ import type { Note } from "../types";
 import NoteCard from "../components/NoteCard";
 import Navbar from "../components/Navbar";
 import API from "../services/apis";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import type { DropResult } from "react-beautiful-dnd";
 
 const NotesPage = () => {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -27,8 +29,25 @@ const NotesPage = () => {
     setNotes((prev) => [...prev, res.data]);
   };
 
+  const handleDelete = async (id: string) => {
+    await API.delete(`/notes/${id}`);
+    setNotes(notes.filter(note => note._id !== id));
+  };
+
+  const handleDragEnd = async (result: DropResult) => {
+    if (!result.destination) return;
+
+    const items = Array.from(notes);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    setNotes(items);
+
+    
+  };
+
   return (
-    <div className="min-h-screen w-screen bg-gray-50">
+    <div className="min-h-screen min-w-screen bg-gray-50">
       <Navbar />
 
       <div className="max-w-4xl mx-auto p-6">
@@ -78,10 +97,23 @@ const NotesPage = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {notes.map((note) => (
-            <NoteCard key={note._id} note={note} />
-          ))}
+        <div className="notes-container">
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable droppableId="notes">
+              {(provided) => (
+                <div
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  className="flex flex-col gap-6"
+                >
+                  {notes.map((note, index) => (
+                    <NoteCard key={note._id} note={note} index={index} onDelete={handleDelete} />
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
         </div>
       </div>
     </div>

@@ -5,4 +5,5 @@ export interface Note {
   theme: string;
   status: string;
   createdAt: string;
+  order: number;
 }
