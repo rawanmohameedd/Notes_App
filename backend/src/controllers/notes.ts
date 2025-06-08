@@ -7,7 +7,7 @@ export const getNotes = async (req: AuthRequest, res: Response) => {
     res.status(401).json({ msg: "Unauthorized" });
     return;
   }
-  const notes = await Note.find({ userId: req.user.id });
+  const notes = await Note.find({ userId: req.user.id }).sort({ order: 1 });
   res.json(notes);
 };
 
@@ -17,7 +17,12 @@ export const createNote = async (req: AuthRequest, res: Response) => {
     return;
   }
   const { title, content, theme, status } = req.body;
-  const note = new Note({ title, content, theme, status, userId: req.user.id });
+  
+  // Get the highest order value
+  const lastNote = await Note.findOne({ userId: req.user.id }).sort({ order: -1 });
+  const order = lastNote ? lastNote.order + 1 : 0;
+  
+  const note = new Note({ title, content, theme, status, userId: req.user.id, order });
   await note.save();
   res.json(note);
 };

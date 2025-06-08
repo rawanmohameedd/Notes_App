@@ -43,7 +43,24 @@ const NotesPage = () => {
 
     setNotes(items);
 
-    
+    // Update the order of all notes
+    const updatedNotes = items.map((note, index) => ({
+      ...note,
+      order: index
+    }));
+
+    // Save the new order to the backend
+    try {
+      await Promise.all(
+        updatedNotes.map(note => 
+          API.put(`/notes/${note._id}`, { order: note.order })
+        )
+      );
+    } catch (error) {
+      console.error('Failed to update note order:', error);
+      // Optionally revert the order in the UI if the save fails
+      fetchNotes();
+    }
   };
 
   return (
