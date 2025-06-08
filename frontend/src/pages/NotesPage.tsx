@@ -6,7 +6,7 @@ import API from "../services/apis";
 
 const NotesPage = () => {
   const [notes, setNotes] = useState<Note[]>([]);
-  const [newNote, setNewNote] = useState({ title: "", content: "" });
+const [newNote, setNewNote] = useState({ title: "", content: "", theme: "#f0f0f0" });
 
   const fetchNotes = async () => {
     const res = await API.get("/notes");
@@ -18,10 +18,11 @@ const NotesPage = () => {
   }, []);
 
   const handleCreate = async () => {
-    const res = await API.post("/notes", { ...newNote });
-    setNewNote({ title: "", content: "" });
-    setNotes((prev) => [...prev, res.data]);
-  };
+  const res = await API.post("/notes", newNote);
+  setNewNote({ title: "", content: "", theme: "#f0f0f0" });
+  setNotes((prev) => [...prev, res.data]);
+};
+
 
   return (
     <div>
@@ -29,6 +30,7 @@ const NotesPage = () => {
       <h2>Your Notes</h2>
       <input placeholder="Title" value={newNote.title} onChange={(e) => setNewNote({ ...newNote, title: e.target.value })} />
       <input placeholder="Content" value={newNote.content} onChange={(e) => setNewNote({ ...newNote, content: e.target.value })} />
+      <input type="color" value={newNote.theme} onChange={(e) => setNewNote({ ...newNote, theme: e.target.value })} />
       <button onClick={handleCreate}>Add Note</button>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
         {notes.map((note) => (
