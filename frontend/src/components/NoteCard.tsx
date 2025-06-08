@@ -9,17 +9,17 @@ const NoteCard = ({ note, index, onDelete }: { note: Note; index: number; onDele
   const [currentTheme, setCurrentTheme] = useState(note.theme || "#fef3c7");
 
   const handleDelete = async () => {
-    await onDelete(note._id);
+    await onDelete(note.id);
   };
 
   const handleThemeChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTheme = e.target.value;
     setCurrentTheme(newTheme);
-    await API.put(`/notes/${note._id}`, { theme: newTheme });
+    await API.put(`/notes/${note.id}`, { theme: newTheme });
   };
 
   return (
-    <Draggable draggableId={note._id} index={index}>
+    <Draggable draggableId={note.id} index={index}>
       {(provided, snapshot) => (
         <div
           ref={provided.innerRef}

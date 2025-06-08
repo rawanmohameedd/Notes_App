@@ -31,7 +31,7 @@ const NotesPage = () => {
 
   const handleDelete = async (id: string) => {
     await API.delete(`/notes/${id}`);
-    setNotes(notes.filter(note => note._id !== id));
+    setNotes(notes.filter(note => note.id !== id));
   };
 
   const handleDragEnd = async (result: DropResult) => {
@@ -53,7 +53,7 @@ const NotesPage = () => {
     try {
       await Promise.all(
         updatedNotes.map(note => 
-          API.put(`/notes/${note._id}`, { order: note.order })
+          API.put(`/notes/${note.id}`, { order: note.order })
         )
       );
     } catch (error) {
@@ -124,7 +124,7 @@ const NotesPage = () => {
                   className="flex flex-col gap-6"
                 >
                   {notes.map((note, index) => (
-                    <NoteCard key={note._id} note={note} index={index} onDelete={handleDelete} />
+                    <NoteCard key={note.id} note={note} index={index} onDelete={handleDelete} />
                   ))}
                   {provided.placeholder}
                 </div>
